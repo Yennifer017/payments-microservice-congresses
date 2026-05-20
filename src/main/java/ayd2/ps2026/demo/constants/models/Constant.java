@@ -12,6 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor
 @Data
+@Table(name = "constants")
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Constant extends Auditor {

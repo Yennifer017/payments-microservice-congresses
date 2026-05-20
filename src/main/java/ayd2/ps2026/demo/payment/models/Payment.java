@@ -1,6 +1,7 @@
 package ayd2.ps2026.demo.payment.models;
 
 import ayd2.ps2026.demo.common.models.entities.Auditor;
+import ayd2.ps2026.demo.wallet.models.Wallet;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,21 +17,20 @@ import org.hibernate.annotations.DynamicUpdate;
 @EqualsAndHashCode(callSuper = true)
 public class Payment extends Auditor {
 
-    /*
-    // for enums
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AdTypeEnum type;
-    */
+    private Integer congressId;
 
     @Column(nullable = false)
-    private Float costPerHour;
+    private String description;
 
-    /*
-    //relations
+    @Column(nullable = false)
+    private Float amount;
+
+    @Column(nullable = false)
+    private Float commission;
+
     @ManyToOne
     @JoinColumn(nullable = false)
-    private AppUser appUser;
-    */
+    private Wallet wallet;
 
 }

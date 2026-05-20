@@ -31,7 +31,7 @@ public class ConstantController {
                     @ApiResponse(responseCode = "200", description = "Exito"),
                     @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
             })
-    @PostMapping("/example")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     public ConstantDTO updateConstant(@RequestBody @Valid EditConstantDTO editConstantDTO) throws NotFoundException {
