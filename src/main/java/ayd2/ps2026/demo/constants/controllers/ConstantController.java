@@ -50,7 +50,7 @@ public class ConstantController {
             })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ConstantDTO> getAllConstants(@PathVariable String example) throws NotFoundException {
+    public List<ConstantDTO> getAllConstants(){
         return this.constantService.getAllConstants();
     }
 
