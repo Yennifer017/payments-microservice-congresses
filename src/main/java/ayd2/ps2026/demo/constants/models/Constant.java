@@ -1,4 +1,4 @@
-package ayd2.ps2026.demo.example.models;
+package ayd2.ps2026.demo.constants.models;
 
 import ayd2.ps2026.demo.common.models.entities.Auditor;
 import jakarta.persistence.*;
@@ -14,23 +14,12 @@ import org.hibernate.annotations.DynamicUpdate;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Model extends Auditor {
-
-    /*
-    // for enums
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AdTypeEnum type;
-    */
+public class Constant extends Auditor {
 
     @Column(nullable = false)
-    private Float costPerHour;
+    private String name;
 
-    /*
-    //relations
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private AppUser appUser;
-    */
+    @Column(nullable = false)
+    private Float value;
 
 }

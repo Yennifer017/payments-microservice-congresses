@@ -55,6 +55,7 @@ public enum PublicEndpointsEnum {
 
     //ALL_CATEGORIES(HttpMethod.GET, "/api/v1/category/**"),
 
+    CONSTANTS(HttpMethod.GET, "/api/v1/constants"),
     // Rutas publicas de Activity
     SWAGGER_UI(null, "/swagger-ui/**"),
     API_DOCS(null, "/v3/api-docs/**")

@@ -1,4 +1,4 @@
-package ayd2.ps2026.demo.example.dtos.request;
+package ayd2.ps2026.demo.payment.dtos.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
-package ayd2.ps2026.demo.example.controllers;
+package ayd2.ps2026.demo.payment.controllers;
 
 import ayd2.ps2026.demo.common.exceptions.NotFoundException;
-import ayd2.ps2026.demo.example.dtos.request.ModelCreateDTO;
-import ayd2.ps2026.demo.example.mappers.ModelMapper;
-import ayd2.ps2026.demo.example.services.ModelService;
+import ayd2.ps2026.demo.payment.dtos.request.ModelCreateDTO;
+import ayd2.ps2026.demo.payment.mappers.PaymentMapper;
+import ayd2.ps2026.demo.payment.services.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/example")
 @RequiredArgsConstructor
-public class ExampleController {
-    private final ModelService modelService;
-    private final ModelMapper modelMapper;
+public class PaymentController {
+    private final PaymentService paymentService;
+    private final PaymentMapper paymentMapper;
 
     /**
      * example
