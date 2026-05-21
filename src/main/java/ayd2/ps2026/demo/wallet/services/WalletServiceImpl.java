@@ -33,14 +33,15 @@ public class WalletServiceImpl implements WalletService {
                                 .getAuthentication()
                                 .getPrincipal())
                         .getId();
-        return walletRepository.findByUserId(userId)
-                .orElse(createWallet(userId));
+        return this.walletRepository.findByUserId(userId)
+                .orElseGet(() -> this.createWallet(userId));
     }
 
     @Override
     public WalletDTO addToWallet(AddAmountDTO addAmountDTO) {
         Wallet wallet = this.getWallet();
         wallet.setCurrency(wallet.getCurrency() + addAmountDTO.getAmount());
+        this.walletRepository.save(wallet);
         return walletMapper.walletToWalletDto(wallet);
     }
 
