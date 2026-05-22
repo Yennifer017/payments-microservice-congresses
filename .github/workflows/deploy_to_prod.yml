@@ -1,0 +1,99 @@
+name: deploy_to_prod.yml
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ${{ vars.REGISTRY }}
+  IMAGE_OWNER: ${{ vars.IMAGE_OWNER }}
+  SERVICE_NAME: ${{ vars.SERVICE_NAME }}
+  NEW_IMAGE_TAG: "prod-${{ github.sha }}"
+  ENV_TAG_NAME: ${{ vars.ENV_TAG_NAME }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build JAR
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package
+
+      - name: Prepare artifact
+        run: cp target/*.jar service.jar
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+          docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_OWNER/$SERVICE_NAME:$NEW_IMAGE_TAG .
+
+      - name: Push Docker image
+        run: |
+          docker push $REGISTRY/$IMAGE_OWNER/$SERVICE_NAME:$NEW_IMAGE_TAG
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          envs: GITHUB_TOKEN,REGISTRY,IMAGE_OWNER,SERVICE_NAME,NEW_IMAGE_TAG,ENV_TAG_NAME
+          script: |
+            set -e
+            cd ~/cnb_congress
+            
+            printf "%s" "$GITHUB_TOKEN" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+            
+            OLD_TAG=$(grep "^${ENV_TAG_NAME}=" .env | cut -d'=' -f2 || true)
+            echo "Current running version: $OLD_TAG"
+            
+            rollback() {
+              echo "Deploy FAILED. Starting rollback..."
+              if [ -n "$OLD_TAG" ]; then
+                echo "Rolling back to $OLD_TAG"
+                sed -i "s/^${ENV_TAG_NAME}=.*/${ENV_TAG_NAME}=${OLD_TAG}/" .env
+                docker compose pull $SERVICE_NAME
+                docker compose up -d $SERVICE_NAME
+                echo "Rollback complete"
+              else
+                echo "No previous version found in .env, manual intervention required"
+              fi
+              docker logout $REGISTRY
+              exit 1
+            } 
+            
+            echo "Deploying version: $NEW_IMAGE_TAG"
+            sed -i "s/^${ENV_TAG_NAME}=.*/${ENV_TAG_NAME}=${NEW_IMAGE_TAG}/" .env
+            docker compose pull $SERVICE_NAME
+            docker compose up -d $SERVICE_NAME
+
+            echo "Waiting for service to start..."
+            sleep 60s
+            if curl --retry 5 --retry-delay 20 -f http://localhost:80/auth/payment/health; then
+              echo "Deploy OK"
+              docker logout $REGISTRY
+            else
+              rollback
+            fi

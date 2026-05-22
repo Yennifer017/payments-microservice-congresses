@@ -1,9 +1,10 @@
-package ayd2.ps2026.demo.example.controllers;
+package ayd2.ps2026.demo.constants.controllers;
 
 import ayd2.ps2026.demo.common.exceptions.NotFoundException;
-import ayd2.ps2026.demo.example.dtos.request.ModelCreateDTO;
-import ayd2.ps2026.demo.example.mappers.ModelMapper;
-import ayd2.ps2026.demo.example.services.ModelService;
+import ayd2.ps2026.demo.constants.dtos.request.EditConstantDTO;
+import ayd2.ps2026.demo.constants.dtos.response.ConstantDTO;
+import ayd2.ps2026.demo.constants.mappers.ConstantMapper;
+import ayd2.ps2026.demo.constants.services.ConstantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -12,44 +13,45 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/v1/example")
+@RequestMapping("/api/v1/constants")
 @RequiredArgsConstructor
-public class ExampleController {
-    private final ModelService modelService;
-    private final ModelMapper modelMapper;
+public class ConstantController {
+    private final ConstantService constantService;
+    private final ConstantMapper constantMapper;
 
     /**
-     * example
+     * update a constant
      */
-    @Operation(summary = "example",
-            description = "example",
+    @Operation(summary = "update a constant",
+            description = "update a constant",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Exito"),
                     @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
             })
-    @PostMapping("/example")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public void example(@RequestBody @Valid ModelCreateDTO modelCreateDTO) {
-
+    public ConstantDTO updateConstant(@RequestBody @Valid EditConstantDTO editConstantDTO) throws NotFoundException {
+        return constantService.updateConstant(editConstantDTO);
     }
 
 
     /**
-     * example
+     * get all constants
      **/
-    @Operation(summary = "example",
-            description = "example",
+    @Operation(summary = "get all constants",
+            description = "get all constants",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Exitoso"),
                     @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
             })
-    @GetMapping("/{example}")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN')")
-    public void example(@PathVariable String example) throws NotFoundException {
-
+    public List<ConstantDTO> getAllConstants(){
+        return this.constantService.getAllConstants();
     }
 
 }
