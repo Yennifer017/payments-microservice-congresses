@@ -91,7 +91,7 @@ jobs:
 
             echo "Waiting for service to start..."
             sleep 60s
-            if curl --retry 5 --retry-delay 20 -f http://localhost:80/auth/payment/health; then
+            if curl --retry 5 --retry-delay 20 -f http://localhost:80/auth/payments/health; then
               echo "Deploy OK"
               docker logout $REGISTRY
             else
