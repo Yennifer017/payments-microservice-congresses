@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.getWriter().write(new ObjectMapper().writeValueAsString(
                         new ErrorDTO("Token inválido o expirado.")
                 ));
-
+                return;
             }
 
         }
