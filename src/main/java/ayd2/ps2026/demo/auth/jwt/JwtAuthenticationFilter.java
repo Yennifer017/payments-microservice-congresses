@@ -97,8 +97,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
      */
     protected boolean isPublicEndpoint(HttpServletRequest request) {
-        String requestPath = request.getRequestURI();
-        String requestMethod = request.getMethod(); // <-- ESTA LÍNEA
+        String requestPath = request.getServletPath();
+        String requestMethod = request.getMethod();
         AntPathMatcher matcher = new AntPathMatcher();
 
         for (PublicEndpointsEnum endpoint : PublicEndpointsEnum.values()) {

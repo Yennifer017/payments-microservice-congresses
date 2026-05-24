@@ -70,7 +70,7 @@ class JwtAuthenticationFilterTest {
     void isPublicEndpoint_true() {
 
         // Arrange
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn(PUBLIC_ENDPOINT_GET);
 
         when(request.getMethod())
@@ -88,7 +88,7 @@ class JwtAuthenticationFilterTest {
     void isPublicEndpoint_allMethods_true() {
 
         // Arrange
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn(PUBLIC_ENDPOINT_ALL);
 
         when(request.getMethod())
@@ -106,7 +106,7 @@ class JwtAuthenticationFilterTest {
     void isPublicEndpoint_false() {
 
         // Arrange
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn(PRIVATE_ENDPOINT);
 
         when(request.getMethod())
@@ -288,7 +288,7 @@ class JwtAuthenticationFilterTest {
             throws ServletException, IOException {
 
         // Arrange
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn(PUBLIC_ENDPOINT_GET);
 
         when(request.getMethod())
@@ -311,8 +311,8 @@ class JwtAuthenticationFilterTest {
             throws ServletException, IOException {
 
         // Arrange
-        when(request.getRequestURI())
-                .thenReturn("/private");
+        /*when(request.getRequestURI())
+                .thenReturn("/private");*/
 
         when(request.getMethod())
                 .thenReturn("GET");
@@ -361,7 +361,7 @@ class JwtAuthenticationFilterTest {
         // Arrange
         PrintWriter writer = mock(PrintWriter.class);
 
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn("/private");
 
         when(request.getMethod())
@@ -394,8 +394,7 @@ class JwtAuthenticationFilterTest {
                 () -> verify(writer)
                         .write(anyString()),
 
-                () -> verify(filterChain)
-                        .doFilter(request, response)
+                () -> verifyNoInteractions(filterChain)
         );
     }
 
@@ -404,7 +403,7 @@ class JwtAuthenticationFilterTest {
             throws ServletException, IOException {
 
         // Arrange
-        when(request.getRequestURI())
+        when(request.getServletPath())
                 .thenReturn(PUBLIC_ENDPOINT_GET);
 
         when(request.getMethod())
