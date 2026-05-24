@@ -27,23 +27,24 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public Wallet getWallet() {
-        Integer userId =
-                ((CustomUserDetails)
-                        SecurityContextHolder.getContext()
-                                .getAuthentication()
-                                .getPrincipal())
-                        .getId();
-        return this.walletRepository.findByUserId(userId)
-                .orElseGet(() -> this.createWallet(userId));
+
+        Integer userId = ((CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal())
+                .getId();
+
+        return walletRepository.findByUserId(userId)
+                .orElseGet(() -> createWallet(userId));
     }
 
     @Override
     public WalletDTO addToWallet(AddAmountDTO addAmountDTO) {
         Wallet wallet = this.getWallet();
         wallet.setCurrency(wallet.getCurrency() + addAmountDTO.getAmount());
-        this.walletRepository.save(wallet);
+
+        walletRepository.save(wallet);
+
         return walletMapper.walletToWalletDto(wallet);
     }
-
 
 }
