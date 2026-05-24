@@ -10,9 +10,12 @@ import ayd2.ps2026.demo.payment.mappers.PaymentMapper;
 import ayd2.ps2026.demo.payment.models.Payment;
 import ayd2.ps2026.demo.payment.repositories.PaymentRepository;
 import ayd2.ps2026.demo.wallet.models.Wallet;
+import ayd2.ps2026.demo.wallet.repositories.WalletRepository;
 import ayd2.ps2026.demo.wallet.services.WalletService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +34,8 @@ import static org.mockito.Mockito.when;
 class PaymentServiceImplTest {
 
     private static final Integer WALLET_ID = 1;
+    private static final Integer USER_ID = 2;
+    private static final Float WALLET_CURRENCY = 100f;
 
     private static final Float PAYMENT_AMOUNT = 100f;
     private static final Float COMMISSION_PERCENTAGE = 0.10f;
@@ -55,81 +60,48 @@ class PaymentServiceImplTest {
     @Mock
     private ConstantService constantService;
 
+    @Mock
+    private WalletRepository walletRepository;
+
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
     @Test
-    void registerPayment_success()
-            throws NotFoundException {
+    void registerPayment_success() throws NotFoundException {
 
-        // Arrange
-        CreatePaymentDTO createPaymentDTO =
-                new CreatePaymentDTO();
+        CreatePaymentDTO dto = new CreatePaymentDTO();
+        dto.setAmount(PAYMENT_AMOUNT);
 
-        createPaymentDTO.setAmount(PAYMENT_AMOUNT);
-
-        Wallet wallet =
-                new Wallet();
-
+        Wallet wallet = new Wallet(USER_ID, WALLET_CURRENCY);
         wallet.setId(WALLET_ID);
 
-        Payment payment =
-                new Payment();
+        Payment payment = new Payment();
 
-        Constant constant =
-                new Constant();
-
+        Constant constant = new Constant();
         constant.setValue(COMMISSION_PERCENTAGE);
 
-        Payment savedPayment =
-                new Payment();
-
+        Payment savedPayment = new Payment();
         savedPayment.setAmount(REAL_AMOUNT);
         savedPayment.setCommission(COMMISSION);
 
-        when(walletService.getWallet())
-                .thenReturn(wallet);
-
-        when(paymentMapper.createPaymentDtoToPayment(createPaymentDTO))
-                .thenReturn(payment);
-
-        when(constantService.getConstant(
-                ConstantsEnum.COMMISSION_PERCENTAGE.getId()
-        )).thenReturn(constant);
-
-        when(paymentRepository.save(payment))
+        when(walletService.getWallet()).thenReturn(wallet);
+        when(paymentMapper.createPaymentDtoToPayment(dto)).thenReturn(payment);
+        when(constantService.getConstant(ConstantsEnum.COMMISSION_PERCENTAGE.getId()))
+                .thenReturn(constant);
+        when(paymentRepository.save(any(Payment.class)))
                 .thenReturn(savedPayment);
 
-        // Act
-        Payment result =
-                paymentService.registerPayment(createPaymentDTO);
+        Payment result = paymentService.registerPayment(dto);
 
-        // Assert
+        ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
+        verify(paymentRepository).save(captor.capture());
+
+        Payment captured = captor.getValue();
+
         assertAll(
-                () -> verify(walletService)
-                        .getWallet(),
-
-                () -> verify(paymentMapper)
-                        .createPaymentDtoToPayment(createPaymentDTO),
-
-                () -> verify(constantService)
-                        .getConstant(ConstantsEnum.COMMISSION_PERCENTAGE.getId()),
-
-                () -> verify(paymentRepository)
-                        .save(payment),
-
-                () -> assertEquals(wallet, payment.getWallet()),
-
-                () -> assertEquals(
-                        REAL_AMOUNT,
-                        payment.getAmount()
-                ),
-
-                () -> assertEquals(
-                        COMMISSION,
-                        payment.getCommission()
-                ),
-
+                () -> assertEquals(wallet, captured.getWallet()),
+                () -> assertEquals(REAL_AMOUNT, captured.getAmount()),
+                () -> assertEquals(COMMISSION, captured.getCommission()),
                 () -> assertEquals(savedPayment, result)
         );
     }

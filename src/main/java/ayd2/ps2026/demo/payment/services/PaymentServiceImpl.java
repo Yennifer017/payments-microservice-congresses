@@ -29,7 +29,7 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-     private final WalletRepository walletRepository;
+    private final WalletRepository walletRepository;
     private final PaymentMapper paymentMapper;
 
     private final WalletService walletService;
